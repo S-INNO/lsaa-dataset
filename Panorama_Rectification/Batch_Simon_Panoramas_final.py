@@ -36,7 +36,7 @@ Country_city = 'New'
 
 new_count = 5
 
-tmp_count = str(new_count)
+tmp_count = int(new_count)
 
 
 
