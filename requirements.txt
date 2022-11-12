@@ -6,8 +6,6 @@ idna==2.8
 imageio==2.5.0
 kiwisolver==1.1.0
 matplotlib==3.1.1
-mkl-fft==1.0.12
-mkl-random==1.0.2
 networkx==2.3
 numpy==1.16.4
 pandas==0.24.2
