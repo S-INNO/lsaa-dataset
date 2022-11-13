@@ -25,6 +25,7 @@ from Panos.Pano_histogram import calculate_histogram
 from Panos.Pano_project import project_facade_for_refine
 from argparse import ArgumentParser
 
+import time
 
 ########## get param
 parser = ArgumentParser()
@@ -36,6 +37,10 @@ parser.add_argument(
     '--out',
     default='Pano_new/New/Rendering',
     help='image folder')
+parser.add_argument(
+    '--imgsmode',
+    default='folder',
+    help='--if imgs is a single image instead of a folder, enter "image"')
 args = parser.parse_args()
 
 ########## add new random seed
@@ -50,11 +55,15 @@ Country_city = 'New'
 
 tmp_count = 1 # pylsd.lsd(scale=tmp_count)
 
-Img_folder = args.imgs
 inter_Dir = os.path.join(root, 'Pano_hl_z_vp/')
 
-imageList = glob.glob(os.path.join(Img_folder ,'*.jpg'))
-imageList.sort()
+if args.imgsmode=='image':
+    print('single')
+    imageList = [args.imgs]
+else:
+    Img_folder = args.imgs
+    imageList = glob.glob(os.path.join(Img_folder ,'*.jpg'))
+    imageList.sort()
 
 rendering_output_folder = args.out
 if not os.path.exists(rendering_output_folder):
@@ -62,8 +71,13 @@ if not os.path.exists(rendering_output_folder):
 
 # for im_path in ['/home/zhup/Desktop/GSV_Pano_val/Val/images/9wG3a9VOkwTSqnq6zsbdSQ.jpg']:
 # for im_path in imageList[10*new_count:10*(new_count+1)]:
+start_time = time.perf_counter()
+temp_time = start_time 
+img_sum = len(imageList)
+img_num = 0
 for im_path in imageList:
-    print(im_path)
+    img_num += 1
+    print(f'===start processing: {img_num}/{img_sum} {im_path}')
     im = Image.open(im_path)
     # rendering_img_base = os.path.join(rendering_output_folder, os.path.splitext(os.path.basename(im_path))[0])
     rendering_img_base = os.path.join(rendering_output_folder, os.path.splitext(os.path.basename(im_path))[0])
@@ -224,6 +238,18 @@ for im_path in imageList:
     ###################### Rendering images from panoramas
 
     project_facade_for_refine(np.array(final_hvps_rectified), im.copy(), pitch, roll, im_path, root, tmp_folder, rendering_img_base, tmp_count)
-    print(100)
-
-
+    now_time = time.perf_counter()
+    cost = now_time - start_time 
+    cost_h = int(cost // 3600)
+    cost_m = int((cost - cost_h * 3600) // 60)
+    cost_s = int(cost - cost_h * 3600 - cost_m * 60)
+    predict = (img_sum - img_num) * ((now_time - start_time) / img_num)
+    predict_h = int(predict // 3600)
+    predict_m = int((predict - predict_h * 3600) // 60)
+    predict_s = int(predict - predict_h * 3600 - predict_m * 60)
+    print(f'=finish processing:{img_num}/{img_sum} {im_path}  \n'
+            f'=total time cost：{cost_h}h{cost_m}m{cost_s}s  \n'
+            f'=last image cost：{round(now_time - temp_time, 2)}s  \n'
+            f'=average time per image：{round(cost / img_num, 2)}s \n'
+            f'=still need：{predict_h}h{predict_m}m{predict_s}s')
+    temp_time = now_time
