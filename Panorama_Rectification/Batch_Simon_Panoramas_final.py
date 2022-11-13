@@ -23,6 +23,20 @@ from Panos.Pano_consensus_vis import draw_consensus_zp_hvps, draw_consensus_rect
 import Pano_hvp
 from Panos.Pano_histogram import calculate_histogram
 from Panos.Pano_project import project_facade_for_refine
+from argparse import ArgumentParser
+
+
+########## get param
+parser = ArgumentParser()
+parser.add_argument(
+    '--imgs',
+    default='Pano_new/New/images',
+    help='image folder with .jpg image')
+parser.add_argument(
+    '--out',
+    default='Pano_new/New/Rendering',
+    help='image folder')
+args = parser.parse_args()
 
 ########## add new random seed
 #np.random.seed(1)
@@ -34,26 +48,19 @@ root = 'Pano_new'
 
 Country_city = 'New'
 
-new_count = 5
+tmp_count = 1 # pylsd.lsd(scale=tmp_count)
 
-tmp_count = int(new_count)
-
-
-
-Img_folder = os.path.join(root, Country_city, 'images/')
+Img_folder = args.imgs
 inter_Dir = os.path.join(root, 'Pano_hl_z_vp/')
 
-
-
-imageList = glob.glob(Img_folder + '*.jpg')
+imageList = glob.glob(os.path.join(Img_folder ,'*.jpg'))
 imageList.sort()
 
-rendering_output_folder = os.path.join(root, Country_city, 'Rendering')
+rendering_output_folder = args.out
 if not os.path.exists(rendering_output_folder):
     os.makedirs(rendering_output_folder)
 
-
-#for im_path in ['/home/zhup/Desktop/GSV_Pano_val/Val/images/9wG3a9VOkwTSqnq6zsbdSQ.jpg']:
+# for im_path in ['/home/zhup/Desktop/GSV_Pano_val/Val/images/9wG3a9VOkwTSqnq6zsbdSQ.jpg']:
 # for im_path in imageList[10*new_count:10*(new_count+1)]:
 for im_path in imageList:
     print(im_path)
